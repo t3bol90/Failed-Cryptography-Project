@@ -1,4 +1,4 @@
-import hashlib
+﻿import hashlib
 from os import system
 from random import randint
 from time import sleep, perf_counter
@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
 
 import getpass
+
 private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
 public_key = private_key.public_key()
 
@@ -34,7 +35,7 @@ S_WRONGINP = '''WRONG INPUT! PLEASE TRY AGAIN'''
 
 S_LOGINERR = '''OOPS! SOME THING WENT WRONG'''
 
-key = 'aáàạảãăắằặẳẵâấầậẩẫbcdđeéẹẻẽêếềệểễfghiíìịỉĩjklmnoóòọỏõôốồộổỗơớờợởỡpqrstuúùụủũưứừựửữvwxyýỳỵỷỹAÁÀẠẢÃĂẮẰẶẲẴÂẤẦẬẨẪBCDĐEÉẸẺẼÊẾỀỆỂỄFGHIÍÌỊỈĨJKLMNOÓÒỌỎÕÔỐỒỘỔỖƠỚỜỢỞỠPQRSTUÚÙỤỦŨƯỨỪỰỬỮVWXYÝỲỴỶỸ0123456789`~!@#$%^&*()'
+key = 'abcdefghijklmnopqrstuvwxyz'
 
 
 def goodbye():
@@ -43,7 +44,10 @@ def goodbye():
     print("Press Enter to confirm exit!")
     input()
 
-
+def output(text):
+    fileout = open('output.txt', 'w')
+    fileout.write(str(text))
+    fileout.close()
 # hàm load file account.txt và save vào account_hash.txt (For testing)
 def hash_txt_save():
     filein = open('account.txt', 'r')
@@ -207,9 +211,9 @@ def menu3(type):
     system('cls')
     if (type == 0):
         text = readfile()
-        print("[1] Encrypt 1 (Shifting) {60s/50MB file test}\n")
-        print("[2] Encrypt 2 (Fernet)   {Approximately 1 day/50MB file test\n")
-        print("[3] Encrypt 3 (RSA)      {Limit}\n")
+        print("[1] Encrypt 1 (Shifting) {15 minutes/50MB file test}\n")
+        print("[2] Encrypt 2 (Fernet)   {Approximately 2~3s\n")
+        print("[3] Encrypt 3 (RSA)      {Cant use with file too large (2KB is a large file :))!}\n")
         print("[E]xit\n")
         user_input = ''
         while len(user_input) != 1:
@@ -219,24 +223,25 @@ def menu3(type):
             system('cls')
             print("[1] Encrypt 1 (Shifting)\n")
             n = randint(0, 225)
+            print("Key shifting : ", n)
             t0 = perf_counter()
             cypher = encrypt1(n, text)
             t1 = perf_counter()
-            print(t1 - t0," secs")
-            print("Key shifting : ", n)
-            print("Cypher :", cypher)
-            print("Text after decrypt: ", decrypt1(n, cypher))
-            input()
+            output(cypher)
+            if len(text) < 256:
+                print("Text after decrypt: ", decrypt1(n, cypher))
+            print(t1 - t0, " secs")
         elif guess_in_lower == '2':
             system('cls')
             print("[2] Encrypt 2 (Fernet)\n")
             t0 = perf_counter()
             (Fernet_key, Fernet_token) = encrypt2(text)
             t1 = perf_counter()
-            print(t1 - t0," secs")
             print("Key: ", Fernet_key)
-            print("Token: ", Fernet_token)
-            print("Text after decrypt: ", decrypt2(Fernet_key, Fernet_token))
+            output(Fernet_token)
+            if len(text) < 256:
+                print("Text after decrypt: ", decrypt2(Fernet_key, Fernet_token))
+            print(t1 - t0, " secs")
             input()
         elif guess_in_lower == '3':
             if len(text) < 255:
@@ -248,7 +253,7 @@ def menu3(type):
                 print(t1 - t0, " secs")
                 # print("\nPrivated key : ", private_key)
                 # print("\nPublic key   : ", public_key)
-                print("\nCyphertext: ", cypher)
+                output(cypher)
                 print("\nText after decrypt: ", decrypt3(cypher))
                 input()
             else:
@@ -265,9 +270,9 @@ def menu3(type):
         print("Please input plaintext to encrypt: ")
         text = input()
         system('cls')
-        print("[1] Encrypt 1 (Shifting) {60s/50MB file test}\n")
-        print("[2] Encrypt 2 (Fernet)   {Approximately 1 day/50MB file test\n")
-        print("[3] Encrypt 3 (RSA)      {Cant use with file too large (2KB is a large file :))!}\n")
+        print("[1] Encrypt 1 (Shifting)\n")
+        print("[2] Encrypt 2 (Fernet)  \n")
+        print("[3] Encrypt 3 (RSA)      \n")
         print("[E] xit\n")
         user_input = ''
         while len(user_input) != 1:
@@ -280,20 +285,20 @@ def menu3(type):
             t0 = perf_counter()
             cypher = encrypt1(n, text)
             t1 = perf_counter()
-            print(t1 - t0, " secs")
             print("Key shifting : ", n)
             print("Cypher :", cypher)
             print("Text after decrypt: ", decrypt1(n, cypher))
+            print(t1 - t0, " secs")
         elif guess_in_lower == '2':
             system('cls')
             print("[2] Encrypt 2 (Fernet)\n")
             t0 = perf_counter()
             (Fernet_key, Fernet_token) = encrypt2(text)
             t1 = perf_counter()
-            print(t1 - t0, " secs")
             print("Key: ", Fernet_key)
             print("Token: ", Fernet_token)
             print("Text after decrypt: ", decrypt2(Fernet_key, Fernet_token))
+            print(t1 - t0, " secs")
         elif guess_in_lower == '3':
             if len(text) < 214:
                 system('cls')
@@ -306,7 +311,6 @@ def menu3(type):
                 # print("\nPublic key   : ", public_key)
                 print("\nCyphertext: ", cypher)
                 print("\nText after decrypt: ", decrypt3(cypher))
-                input()
             else:
                 print("RSA is limited for keysize = 2048!")
                 input()
@@ -322,7 +326,7 @@ def menu3(type):
     while len(user_input) != 1:
         user_input = input(':').rstrip('\n')
     guess_in_lower = user_input.lower()
-    if user_input == 'y':
+    if guess_in_lower == 'y':
         menu2(True)
     else:
         goodbye()
@@ -374,4 +378,3 @@ def menu(user_input):
 
 
 menu2(menu(userOption()))
-
